@@ -1,15 +1,16 @@
 package com.example.demo.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 
@@ -25,5 +26,20 @@ public class GlobalControllerExceptionHandler {
         });
         return errors;
     }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public String handleConstraintViolation(ConstraintViolationException ex) {
+        log.debug(
+                "Constraint violation exception encountered: {}",
+                ex.getConstraintViolations(),
+                ex
+        );
+//        Map<String, String> errors = new HashMap<>();
+//        Optional<ConstraintViolation> result = Optional.of(ex.getConstraintViolations().stream().findFirst().get());
+//        errors.put(ex, ex.getConstraintViolations().toString());
+        return ex.getConstraintViolations().toString();
+    }
+
 
 }
